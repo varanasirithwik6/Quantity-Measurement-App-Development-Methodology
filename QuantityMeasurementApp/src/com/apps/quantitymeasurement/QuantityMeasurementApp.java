@@ -8,33 +8,30 @@ public class QuantityMeasurementApp {
         YARDS(3.0),
         CENTIMETERS(0.0328084);
 
-        private final double toFeetFactor;
+        private final double factor;
 
-        LengthUnit(double toFeetFactor) {
-            this.toFeetFactor = toFeetFactor;
+        LengthUnit(double factor) {
+            this.factor = factor;
         }
 
         public double toFeet(double value) {
-            return value * toFeetFactor;
+            return value * factor;
         }
 
-        public double fromFeet(double feetValue) {
-            return feetValue / toFeetFactor;
+        public double fromFeet(double feet) {
+            return feet / factor;
         }
     }
 
     static class QuantityLength {
 
-        final double value;
+        private final double value;
         private final LengthUnit unit;
         private static final double EPSILON = 1e-6;
 
         public QuantityLength(double value, LengthUnit unit) {
-            if (unit == null)
-                throw new IllegalArgumentException("Unit cannot be null");
-
-            if (!Double.isFinite(value))
-                throw new IllegalArgumentException("Invalid value");
+            if (unit == null || !Double.isFinite(value))
+                throw new IllegalArgumentException();
 
             this.value = value;
             this.unit = unit;
@@ -45,26 +42,21 @@ public class QuantityMeasurementApp {
         }
 
         public QuantityLength convertTo(LengthUnit target) {
+            if (target == null) throw new IllegalArgumentException();
+
             double feet = toFeet();
-            double converted = target.fromFeet(feet);
-            return new QuantityLength(converted, target);
+            return new QuantityLength(target.fromFeet(feet), target);
         }
 
-        // ---------- UC6 ADD METHOD ----------
+        // ---------- UC6 ----------
         public QuantityLength add(QuantityLength other) {
-            if (other == null)
-                throw new IllegalArgumentException("Other cannot be null");
-
-            double sumFeet = this.toFeet() + other.toFeet();
-            double result = this.unit.fromFeet(sumFeet);
-
-            return new QuantityLength(result, this.unit);
+            return add(this, other, this.unit);
         }
 
-        // Static version (optional overload)
+        // ---------- UC7 ----------
         public static QuantityLength add(QuantityLength q1, QuantityLength q2, LengthUnit target) {
             if (q1 == null || q2 == null || target == null)
-                throw new IllegalArgumentException("Invalid input");
+                throw new IllegalArgumentException();
 
             double sumFeet = q1.toFeet() + q2.toFeet();
             double result = target.fromFeet(sumFeet);
@@ -72,10 +64,18 @@ public class QuantityMeasurementApp {
             return new QuantityLength(result, target);
         }
 
+        public double getValue() {
+            return value;
+        }
+
+        public LengthUnit getUnit() {
+            return unit;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
+            if (!(obj instanceof QuantityLength)) return false;
 
             QuantityLength other = (QuantityLength) obj;
             return Math.abs(this.toFeet() - other.toFeet()) < EPSILON;
@@ -89,10 +89,11 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCHES);
 
-        System.out.println(a.add(b)); // 2 FEET
-        System.out.println(b.add(a)); // 24 INCHES
+        System.out.println(QuantityLength.add(q1, q2, LengthUnit.FEET));
+        System.out.println(QuantityLength.add(q1, q2, LengthUnit.INCHES));
+        System.out.println(QuantityLength.add(q1, q2, LengthUnit.YARDS));
     }
 }
