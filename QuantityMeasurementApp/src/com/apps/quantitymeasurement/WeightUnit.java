@@ -1,15 +1,14 @@
 package com.apps.quantitymeasurement;
 
-public enum LengthUnit {
+public enum WeightUnit {
 
-    FEET(1.0),
-    INCHES(1.0 / 12.0),
-    YARDS(3.0),
-    CENTIMETERS(0.0328084);
+    KILOGRAM(1.0),
+    GRAM(0.001),
+    POUND(0.453592);
 
     private final double factor;
 
-    LengthUnit(double factor) {
+    WeightUnit(double factor) {
         this.factor = factor;
     }
 

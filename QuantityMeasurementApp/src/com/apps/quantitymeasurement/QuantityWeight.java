@@ -1,12 +1,12 @@
 package com.apps.quantitymeasurement;
 
-public class QuantityLength {
+public class QuantityWeight {
 
     private final double value;
-    private final LengthUnit unit;
+    private final WeightUnit unit;
     private static final double EPSILON = 1e-6;
 
-    public QuantityLength(double value, LengthUnit unit) {
+    public QuantityWeight(double value, WeightUnit unit) {
         if (unit == null || !Double.isFinite(value))
             throw new IllegalArgumentException();
 
@@ -18,41 +18,46 @@ public class QuantityLength {
         return unit.convertToBaseUnit(value);
     }
 
-    public QuantityLength convertTo(LengthUnit target) {
+    public QuantityWeight convertTo(WeightUnit target) {
         if (target == null)
             throw new IllegalArgumentException();
 
         double base = toBase();
-        return new QuantityLength(target.convertFromBaseUnit(base), target);
+        return new QuantityWeight(target.convertFromBaseUnit(base), target);
     }
 
-    public QuantityLength add(QuantityLength other) {
+    public QuantityWeight add(QuantityWeight other) {
         return add(this, other, this.unit);
     }
 
-    public static QuantityLength add(QuantityLength q1, QuantityLength q2, LengthUnit target) {
-        if (q1 == null || q2 == null || target == null)
+    public static QuantityWeight add(QuantityWeight w1, QuantityWeight w2, WeightUnit target) {
+        if (w1 == null || w2 == null || target == null)
             throw new IllegalArgumentException();
 
-        double sumBase = q1.toBase() + q2.toBase();
-        return new QuantityLength(target.convertFromBaseUnit(sumBase), target);
+        double sumBase = w1.toBase() + w2.toBase();
+        return new QuantityWeight(target.convertFromBaseUnit(sumBase), target);
     }
 
     public double getValue() {
         return value;
     }
 
-    public LengthUnit getUnit() {
+    public WeightUnit getUnit() {
         return unit;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof QuantityLength)) return false;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        QuantityLength other = (QuantityLength) obj;
+        QuantityWeight other = (QuantityWeight) obj;
         return Math.abs(this.toBase() - other.toBase()) < EPSILON;
+    }
+
+    @Override
+    public int hashCode() {
+        return Double.hashCode(toBase());
     }
 
     @Override
