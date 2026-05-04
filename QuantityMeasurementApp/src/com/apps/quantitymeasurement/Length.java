@@ -10,24 +10,31 @@ public class Length {
         this.unit = unit;
     }
 
-    private double toBase() {
-        return value * unit.getFactor();
+    private double convertToInches() {
+        if (unit == LengthUnit.FEET) {
+            return value * 12.0;
+        } else {
+            return value;
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
 
-        if (this == obj) return true;
+        if (this == obj) {
+            return true;
+        }
 
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (obj == null) {
+            return false;
+        }
+
+        if (!(obj instanceof Length)) {
+            return false;
+        }
 
         Length other = (Length) obj;
 
-        return Double.compare(this.toBase(), other.toBase()) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.hashCode(toBase());
+        return Double.compare(this.convertToInches(), other.convertToInches()) == 0;
     }
 }
