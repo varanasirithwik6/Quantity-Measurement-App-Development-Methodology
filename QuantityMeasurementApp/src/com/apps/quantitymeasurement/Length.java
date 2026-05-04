@@ -12,18 +12,50 @@ public class Length {
 
     // Convert to inches
     private double toInches() {
-        if (unit == LengthUnit.FEET) {
-            return value * 12;
-        }
-        return value;
+        return (unit == LengthUnit.FEET) ? value * 12 : value;
     }
 
     // Convert from inches
-    private double fromInches(double inches, LengthUnit targetUnit) {
-        if (targetUnit == LengthUnit.FEET) {
-            return inches / 12;
+    private double fromInches(double val, LengthUnit target) {
+        return (target == LengthUnit.FEET) ? val / 12 : val;
+    }
+
+    // 🔥 CENTRAL METHOD (DRY)
+    private double operate(Length other, String op) {
+
+        if (other == null) {
+            throw new IllegalArgumentException("Null value");
         }
-        return inches;
+
+        double a = this.toInches();
+        double b = other.toInches();
+
+        switch (op) {
+            case "ADD": return a + b;
+            case "SUB": return a - b;
+            case "DIV":
+                if (b == 0) throw new ArithmeticException("Divide by zero");
+                return a / b;
+        }
+
+        return 0;
+    }
+
+    // ADD
+    public Length add(Length other) {
+        double res = operate(other, "ADD");
+        return new Length(fromInches(res, this.unit), this.unit);
+    }
+
+    // SUBTRACT
+    public Length subtract(Length other) {
+        double res = operate(other, "SUB");
+        return new Length(fromInches(res, this.unit), this.unit);
+    }
+
+    // DIVIDE
+    public double divide(Length other) {
+        return operate(other, "DIV");
     }
 
     // EQUALS
@@ -34,25 +66,5 @@ public class Length {
 
         Length other = (Length) obj;
         return Double.compare(this.toInches(), other.toInches()) == 0;
-    }
-
-    // ADD
-    public Length add(Length other) {
-        double result = this.toInches() + other.toInches();
-        return new Length(fromInches(result, this.unit), this.unit);
-    }
-
-    // SUBTRACT
-    public Length subtract(Length other) {
-        double result = this.toInches() - other.toInches();
-        return new Length(fromInches(result, this.unit), this.unit);
-    }
-
-    // DIVIDE
-    public double divide(Length other) {
-        if (other.toInches() == 0) {
-            throw new ArithmeticException("Cannot divide by zero");
-        }
-        return this.toInches() / other.toInches();
     }
 }
